@@ -1,0 +1,24 @@
+{
+  "redirects": [
+    {
+      "source": "/v/breath",
+      "destination": "https://youtu.be/KtaAG7yuW-k",
+      "permanent": false
+    },
+    {
+      "source": "/v/shoulder",
+      "destination": "https://youtube.com/shorts/TC9sjkYFpQ0",
+      "permanent": false
+    },
+    {
+      "source": "/v/foot",
+      "destination": "https://youtube.com/shorts/j8KiDs6m-XQ",
+      "permanent": false
+    },
+    {
+      "source": "/v/face",
+      "destination": "https://youtube.com/shorts/nuxDnlAd2iw",
+      "permanent": false
+    }
+  ]
+}
