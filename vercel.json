@@ -19,6 +19,36 @@
       "source": "/v/face",
       "destination": "https://youtube.com/shorts/nuxDnlAd2iw",
       "permanent": false
+    },
+    {
+      "source": "/w/breath1",
+      "destination": "https://youtu.be/VZsdUXmOumQ",
+      "permanent": false
+    },
+    {
+      "source": "/w/breath2",
+      "destination": "https://youtu.be/oAVXXWkCi3Q",
+      "permanent": false
+    },
+    {
+      "source": "/w/breath3",
+      "destination": "https://youtu.be/wTgNFmbtGNg",
+      "permanent": false
+    },
+    {
+      "source": "/w/breath4",
+      "destination": "https://youtu.be/ChSVs-WYRT0",
+      "permanent": false
+    },
+    {
+      "source": "/w/shoulder",
+      "destination": "https://youtu.be/xChynaL-f14",
+      "permanent": false
+    },
+    {
+      "source": "/w/foot",
+      "destination": "https://youtu.be/yZAuOGyYeF0",
+      "permanent": false
     }
   ]
 }
