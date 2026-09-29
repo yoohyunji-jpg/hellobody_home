@@ -42,7 +42,7 @@ input:focus{outline:none;border-color:var(--ink)}
   border-radius:3px;padding:14px 0;font-weight:700;font-size:15px}
 .btn.ghost{background:transparent;color:var(--muted);border-color:var(--line);font-weight:500}
 .gate .or{font-size:12px;color:var(--muted);margin:22px 0 12px}
-.err{font-size:13px;color:var(--red);margin-top:12px;min-height:1.2em}
+.err{font-size:12.5px;color:var(--red);margin-top:12px;min-height:1.2em;word-break:break-all;line-height:1.6}
 
 /* 본 화면 */
 .hd{padding:12px 20px 18px;text-align:center}
@@ -90,6 +90,13 @@ input:focus{outline:none;border-color:var(--ink)}
 .cell.on .o{background:var(--c);border-color:var(--c);color:#fff;font-weight:700}
 .cell.out .o{opacity:.2}
 .cell.now .o{border-color:var(--ink);border-width:2px}
+.links{display:flex;gap:8px;margin:0 0 22px}
+.link{flex:1;text-align:center;text-decoration:none;border:1.5px solid var(--c);
+  border-radius:3px;padding:12px 4px;color:var(--c);font-weight:700;font-size:14px;
+  display:block}
+.link.fill{background:var(--c);color:#fff}
+.link small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;
+  letter-spacing:-.01em}
 .legend{text-align:center;font-size:11.5px;color:var(--muted);margin:0 0 26px;line-height:1.7}
 .foot{text-align:center;font-size:9px;letter-spacing:.3em;color:var(--muted);
   padding-top:22px;border-top:1px solid var(--line);margin:0 16px}
@@ -150,6 +157,22 @@ input:focus{outline:none;border-color:var(--ink)}
     {k:'foot',    n:'발',  c:'#7E9B7A', from:'2026-12-01', note:'세 번째 달부터 · 매일 마흔 번'},
     {k:'face',    n:'얼굴',c:'#8F6426', from:'2026-10-01', note:'언제든 · 하루 세 번'}
   ];
+  var BASE='https://hellobody.co.kr';
+  function videos(p){
+    var how = BASE+'/v/'+p.k;                       // 방법 보기
+    var with_ = null, label = '함께 하기';
+    if(p.k==='breath'){
+      var n = gap(START, S.today) + 1;              // D+N
+      var wk = n<=7 ? 1 : (n<=14 ? 2 : (n<=21 ? 3 : 4));
+      if(n < 1) wk = 1;
+      with_ = BASE+'/w/breath'+wk;
+      label = wk<4 ? (wk+'주차 함께 하기') : '4주차부터 함께 하기';
+    }else if(p.k==='shoulder' || p.k==='foot'){
+      with_ = BASE+'/w/'+p.k;
+    }
+    return {how:how, with:with_, label:label};
+  }
+
   var MONTHS=[[2026,10],[2026,11],[2026,12]];
   var DOW=['일','월','화','수','목','금','토'];
   var KEY='hellobody.dolbom90.code';
@@ -187,7 +210,8 @@ input:focus{outline:none;border-color:var(--ink)}
       btn.textContent='시작하기'; btn.disabled=false;
       if(!r.ok){
         $('#gerr').textContent = r.error==='full'
-          ? '50자리가 모두 찼습니다.' : '잠시 뒤 다시 시도해 주세요.';
+          ? '50자리가 모두 찼습니다.'
+          : ('오류: ' + (r.error || '알 수 없음'));
         if(r.error==='full'){ S.left=0; gate(); }
         return;
       }
@@ -203,7 +227,7 @@ input:focus{outline:none;border-color:var(--ink)}
     $('#gerr').textContent=''; var btn=this; btn.disabled=true;
     api({action:'state',code:v}).then(function(r){
       btn.disabled=false;
-      if(!r.ok){ $('#gerr').textContent='코드를 찾지 못했습니다.'; return; }
+      if(!r.ok){ $('#gerr').textContent='오류: '+(r.error||'코드를 찾지 못했습니다'); return; }
       try{localStorage.setItem(KEY,r.code)}catch(e){}
       set(r);
     }).catch(function(){ btn.disabled=false; $('#gerr').textContent='연결이 되지 않습니다.'; });
@@ -282,6 +306,16 @@ input:focus{outline:none;border-color:var(--ink)}
     meta.innerHTML='<div class="n">'+(S.stamps[p.k]||[]).length+' / '+span(p)+'</div>'+
                    '<div class="d">'+p.note+'</div>';
     box.appendChild(meta);
+
+    var v = videos(p);
+    var links = document.createElement('div');
+    links.className = 'links';
+    var h2 = '<a class="link" href="'+v.how+'" target="_blank" rel="noopener">방법 보기'+
+             '<small>처음 한 번만</small></a>';
+    if(v.with) h2 += '<a class="link fill" href="'+v.with+'" target="_blank" rel="noopener">'+
+             v.label+'<small>영상과 같이</small></a>';
+    links.innerHTML = h2;
+    box.appendChild(links);
 
     MONTHS.forEach(function(mm){
       var y=mm[0], mo=mm[1];
