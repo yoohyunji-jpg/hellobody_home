@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>90일 돌봄</title>
+<style>
+:root{
+  --paper:#FBF9F4; --card:#FFFFFF; --ink:#17150F; --muted:#8A857A;
+  --line:#E4E0D6; --red:#A8382B;
+  --breath:#4E8DBE; --shoulder:#B85C3E; --foot:#7E9B7A; --face:#8F6426;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141210; --card:#1D1A16; --ink:#F3EFE4; --muted:#9A9488; --line:#332E27;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141210; --card:#1D1A16; --ink:#F3EFE4; --muted:#9A9488; --line:#332E27;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--paper);color:var(--ink);
+  font-family:"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  font-size:15px;line-height:1.5;padding:0 0 44px;max-width:560px;margin:0 auto}
+button{font:inherit;cursor:pointer}
+
+.logo{font-size:9px;letter-spacing:.34em;color:var(--muted);text-align:center;padding:20px 0 0}
+
+/* 시작 화면 */
+.gate{padding:14px 22px 0;text-align:center}
+.gate h1{font-size:25px;font-weight:800;letter-spacing:-.02em;margin:16px 0 8px}
+.gate p{font-size:13.5px;color:var(--muted);line-height:1.75;margin-bottom:22px}
+.slots{font-size:12px;color:var(--red);font-weight:700;letter-spacing:.04em;margin-bottom:20px}
+input{width:100%;font:inherit;font-size:16px;padding:13px 14px;text-align:center;
+  border:1.5px solid var(--line);border-radius:3px;background:var(--card);color:var(--ink);
+  margin-bottom:10px}
+input:focus{outline:none;border-color:var(--ink)}
+.btn{width:100%;background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);
+  border-radius:3px;padding:14px 0;font-weight:700;font-size:15px}
+.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line);font-weight:500}
+.gate .or{font-size:12px;color:var(--muted);margin:22px 0 12px}
+.err{font-size:13px;color:var(--red);margin-top:12px;min-height:1.2em}
+
+/* 본 화면 */
+.hd{padding:12px 20px 18px;text-align:center}
+.dday{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.date{font-size:13px;color:var(--muted);margin-top:5px}
+.who{font-size:11.5px;color:var(--muted);margin-top:10px;letter-spacing:.04em}
+.tbar{height:3px;background:var(--line);border-radius:3px;margin:9px 0 0;overflow:hidden}
+.tbar i{display:block;height:100%;width:0;background:var(--ink);transition:width .3s}
+
+.today{margin:0 16px 22px;background:var(--card);border:1px solid var(--line);
+  border-radius:4px;padding:18px 16px}
+.today h2{font-size:12px;letter-spacing:.2em;color:var(--muted);text-align:center;
+  margin-bottom:16px;font-weight:500}
+.picks{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.pick{background:none;border:none;text-align:center;padding:0}
+.pick .ring{width:62px;height:62px;border-radius:50%;border:2.5px solid var(--c);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 7px;
+  transition:background .18s,transform .12s}
+.pick .ring b{font-size:19px;font-weight:800;color:var(--c);transition:color .18s}
+.pick[aria-pressed="true"] .ring{background:var(--c)}
+.pick[aria-pressed="true"] .ring b{color:#fff}
+.pick:active .ring{transform:scale(.93)}
+.pick .lab{font-size:11px;color:var(--muted)}
+.pick[disabled]{opacity:.45}
+.msg{text-align:center;color:var(--muted);font-size:13.5px;line-height:1.75;padding:6px 0}
+
+.tabs{display:flex;gap:7px;padding:0 16px;margin-bottom:16px}
+.tab{flex:1;background:none;border:1px solid var(--line);border-radius:3px;
+  font-size:14px;font-weight:700;color:var(--muted);padding:10px 0}
+.tab[aria-selected="true"]{border-color:var(--c);color:var(--c)}
+
+.panel{padding:0 16px}
+.pmeta{text-align:center;margin-bottom:16px}
+.pmeta .n{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--c)}
+.pmeta .d{font-size:12.5px;color:var(--muted);margin-top:3px}
+.month{margin-bottom:24px}
+.mname{font-size:12px;letter-spacing:.16em;color:var(--muted);text-align:center;margin-bottom:10px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:5px}
+.dow span{text-align:center;font-size:10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.cell.pad{visibility:hidden}
+.cell .o{width:84%;aspect-ratio:1;border-radius:50%;border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11.5px;color:var(--muted)}
+.cell.on .o{background:var(--c);border-color:var(--c);color:#fff;font-weight:700}
+.cell.out .o{opacity:.2}
+.cell.now .o{border-color:var(--ink);border-width:2px}
+.legend{text-align:center;font-size:11.5px;color:var(--muted);margin:0 0 26px;line-height:1.7}
+.foot{text-align:center;font-size:9px;letter-spacing:.3em;color:var(--muted);
+  padding-top:22px;border-top:1px solid var(--line);margin:0 16px}
+.hide{display:none}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;z-index:20;
+  background:var(--ink);color:var(--paper);font-size:13px;padding:10px 18px;border-radius:3px;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:.95}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="logo">H E L L O B O D Y</div>
+
+<!-- 시작 화면 -->
+<section id="gate" class="gate hide">
+  <h1>90일 돌봄</h1>
+  <p>10월 1일부터 12월 29일까지<br>매일 나를 돌보는 90일입니다.</p>
+  <div class="slots" id="slots"></div>
+  <input id="nick" maxlength="20" placeholder="닉네임" autocomplete="off">
+  <button class="btn" id="go">시작하기</button>
+  <p class="or">이미 시작하셨다면</p>
+  <input id="code" maxlength="6" placeholder="복구 코드 (예: 4B7K)" autocomplete="off"
+         style="text-transform:uppercase;letter-spacing:.2em">
+  <button class="btn ghost" id="restore">이어서 하기</button>
+  <p class="err" id="gerr"></p>
+</section>
+
+<!-- 본 화면 -->
+<section id="app" class="hide">
+  <div class="hd">
+    <div class="dday" id="dday">···</div>
+    <div class="date" id="date"></div>
+    <div class="who" id="who"></div>
+    <div class="tbar"><i id="tbar"></i></div>
+  </div>
+  <div class="today">
+    <h2>오 늘</h2>
+    <div class="picks" id="picks"></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="panel" id="panel"></div>
+  <div class="foot">H E L L O B O D Y</div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  // ── 설정 ────────────────────────────────────
+  var API = 'https://script.google.com/macros/s/AKfycbw-965M9mgWpelz9ZTYnts6jAShbNxt5AMCXab3szvKL_qgmgcE9tHBSshTZktFzg2XFA/exec';      // Apps Script 웹 앱 주소
+
+  var START='2026-10-01', END='2026-12-29';
+  var PARTS=[
+    {k:'breath',  n:'숨',  c:'#4E8DBE', from:'2026-10-01', note:'첫 달부터 · 매일 열 번'},
+    {k:'shoulder',n:'어깨',c:'#B85C3E', from:'2026-11-01', note:'두 번째 달부터 · 매일 마흔 번'},
+    {k:'foot',    n:'발',  c:'#7E9B7A', from:'2026-12-01', note:'세 번째 달부터 · 매일 마흔 번'},
+    {k:'face',    n:'얼굴',c:'#8F6426', from:'2026-10-01', note:'언제든 · 하루 세 번'}
+  ];
+  var MONTHS=[[2026,10],[2026,11],[2026,12]];
+  var DOW=['일','월','화','수','목','금','토'];
+  var KEY='hellobody.dolbom90.code';
+
+  var $=function(s){return document.querySelector(s)};
+  var S={code:'',nick:'',slot:0,left:null,stamps:{},today:''};
+  var cur=PARTS[0], busy=false;
+
+  function say(t){var e=$('#toast');e.textContent=t;e.classList.add('on');
+    clearTimeout(say.t);say.t=setTimeout(function(){e.classList.remove('on')},1600)}
+
+  function api(body){
+    return fetch(API,{method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(body)}).then(function(r){return r.json()});
+  }
+  var parse=function(s){return new Date(s+'T00:00:00')};
+  var gap=function(a,b){return Math.round((parse(b)-parse(a))/86400000)};
+  var span=function(p){return gap(p.from,END)+1};
+  var isOn=function(p,d){return (S.stamps[p.k]||[]).indexOf(d)>=0};
+  var live=function(p){return S.today>=p.from && S.today<=END};
+
+  // ── 시작 화면 ───────────────────────────────
+  function gate(){
+    $('#gate').classList.remove('hide'); $('#app').classList.add('hide');
+    if(S.left!==null) $('#slots').textContent =
+      S.left>0 ? ('남은 자리 '+S.left+' / 50') : '50자리가 모두 찼습니다';
+  }
+  $('#go').addEventListener('click',function(){
+    var v=$('#nick').value.trim();
+    if(!v){ $('#gerr').textContent='닉네임을 적어주세요.'; return; }
+    $('#gerr').textContent=''; this.textContent='시작하는 중…'; this.disabled=true;
+    var btn=this;
+    api({action:'join',nickname:v}).then(function(r){
+      btn.textContent='시작하기'; btn.disabled=false;
+      if(!r.ok){
+        $('#gerr').textContent = r.error==='full'
+          ? '50자리가 모두 찼습니다.' : '잠시 뒤 다시 시도해 주세요.';
+        if(r.error==='full'){ S.left=0; gate(); }
+        return;
+      }
+      try{localStorage.setItem(KEY,r.code)}catch(e){}
+      set(r);
+      alert('복구 코드는 '+r.code+' 입니다.\n\n폰을 바꾸거나 화면을 지웠을 때\n이 코드로 기록을 되살릴 수 있습니다.\n적어두세요.');
+    }).catch(function(){ btn.textContent='시작하기'; btn.disabled=false;
+      $('#gerr').textContent='연결이 되지 않습니다.'; });
+  });
+  $('#restore').addEventListener('click',function(){
+    var v=$('#code').value.trim().toUpperCase();
+    if(!v){ $('#gerr').textContent='복구 코드를 적어주세요.'; return; }
+    $('#gerr').textContent=''; var btn=this; btn.disabled=true;
+    api({action:'state',code:v}).then(function(r){
+      btn.disabled=false;
+      if(!r.ok){ $('#gerr').textContent='코드를 찾지 못했습니다.'; return; }
+      try{localStorage.setItem(KEY,r.code)}catch(e){}
+      set(r);
+    }).catch(function(){ btn.disabled=false; $('#gerr').textContent='연결이 되지 않습니다.'; });
+  });
+
+  function set(r){
+    S.code=r.code; S.nick=r.nickname; S.slot=r.slot;
+    S.left=(r.left===undefined?S.left:r.left);
+    S.stamps=r.stamps||{}; S.today=r.today;
+    $('#gate').classList.add('hide'); $('#app').classList.remove('hide');
+    head(); today(); tabs(); panel();
+  }
+
+  // ── 헤더 ────────────────────────────────────
+  function head(){
+    var n=gap(START,S.today)+1;
+    if(n<1){ $('#dday').textContent='D'+(n-1); $('#date').textContent='10월 1일에 시작합니다'; }
+    else if(n>90){ $('#dday').textContent='90일 완료'; $('#date').textContent='세 덩어리를 다 채웠습니다'; }
+    else{
+      $('#dday').textContent='D+'+n;
+      var d=parse(S.today);
+      $('#date').textContent=(d.getMonth()+1)+'월 '+d.getDate()+'일 '+DOW[d.getDay()]+'요일';
+    }
+    var tot=0,cap=0;
+    PARTS.forEach(function(p){ tot+=(S.stamps[p.k]||[]).length; cap+=span(p); });
+    $('#who').textContent=S.nick+'  ·  '+S.code+'  ·  '+tot+' / '+cap+' 칸';
+    $('#tbar').style.width=(cap?tot/cap*100:0)+'%';
+  }
+
+  // ── 오늘 ────────────────────────────────────
+  function today(){
+    var box=$('#picks'); box.innerHTML='';
+    if(S.today<START){ box.innerHTML='<p class="msg">10월 1일부터 시작합니다.</p>'; return; }
+    if(S.today>END){ box.innerHTML='<p class="msg">90일이 끝났습니다.<br>고생 많으셨습니다.</p>'; return; }
+    PARTS.filter(function(p){return live(p)}).forEach(function(p){
+      var b=document.createElement('button');
+      b.className='pick'; b.style.setProperty('--c',p.c);
+      b.setAttribute('aria-pressed',isOn(p,S.today));
+      b.innerHTML='<span class="ring"><b>'+p.n+'</b></span><span class="lab">돌봄</span>';
+      b.addEventListener('click',function(){
+        if(busy) return; busy=true; b.disabled=true;
+        var on=!isOn(p,S.today);
+        api({action:'stamp',code:S.code,part:p.k,on:on}).then(function(r){
+          busy=false; b.disabled=false;
+          if(!r.ok){ say(r.error==='ended'?'기간이 끝났습니다':'저장되지 않았습니다'); return; }
+          if(!S.stamps[p.k]) S.stamps[p.k]=[];
+          var a=S.stamps[p.k], i=a.indexOf(S.today);
+          if(on && i<0) a.push(S.today);
+          if(!on && i>=0) a.splice(i,1);
+          b.setAttribute('aria-pressed',on);
+          head(); if(cur.k===p.k) panel();
+        }).catch(function(){ busy=false; b.disabled=false; say('연결이 되지 않습니다'); });
+      });
+      box.appendChild(b);
+    });
+  }
+
+  // ── 탭 ──────────────────────────────────────
+  function tabs(){
+    var box=$('#tabs'); box.innerHTML='';
+    PARTS.forEach(function(p){
+      var b=document.createElement('button');
+      b.className='tab'; b.style.setProperty('--c',p.c); b.textContent=p.n;
+      b.setAttribute('aria-selected',p.k===cur.k);
+      b.addEventListener('click',function(){cur=p;tabs();panel()});
+      box.appendChild(b);
+    });
+  }
+
+  // ── 달력 (읽기 전용) ─────────────────────────
+  function panel(){
+    var p=cur, box=$('#panel'); box.innerHTML='';
+    box.style.setProperty('--c',p.c);
+    var meta=document.createElement('div');
+    meta.className='pmeta';
+    meta.innerHTML='<div class="n">'+(S.stamps[p.k]||[]).length+' / '+span(p)+'</div>'+
+                   '<div class="d">'+p.note+'</div>';
+    box.appendChild(meta);
+
+    MONTHS.forEach(function(mm){
+      var y=mm[0], mo=mm[1];
+      var first=new Date(y,mo-1,1), last=new Date(y,mo,0).getDate();
+      var w=document.createElement('div'); w.className='month';
+      var h='<div class="mname">'+mo+' 월</div><div class="dow">'+
+        DOW.map(function(d){return '<span>'+d+'</span>'}).join('')+'</div><div class="grid">';
+      for(var i=0;i<first.getDay();i++) h+='<div class="cell pad"></div>';
+      for(var d=1;d<=last;d++){
+        var day=y+'-'+('0'+mo).slice(-2)+'-'+('0'+d).slice(-2);
+        var inRange=(day>=p.from && day<=END);
+        h+='<div class="cell'+(isOn(p,day)?' on':'')+(inRange?'':' out')+
+           (day===S.today?' now':'')+'"><span class="o">'+d+'</span></div>';
+      }
+      h+='</div>'; w.innerHTML=h; box.appendChild(w);
+    });
+
+    var lg=document.createElement('p'); lg.className='legend';
+    lg.textContent='오늘 것만 찍을 수 있습니다. 지난 날은 그대로 남습니다.';
+    box.appendChild(lg);
+  }
+
+  // ── 시작 ────────────────────────────────────
+  var saved=null;
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved){
+    api({action:'state',code:saved}).then(function(r){
+      if(r.ok) set(r); else gate();
+    }).catch(gate);
+  }else{
+    gate();
+  }
+})();
+</script>
+</body>
+</html>
