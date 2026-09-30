@@ -49,9 +49,11 @@
       "source": "/w/foot",
       "destination": "https://youtu.be/yZAuOGyYeF0",
       "permanent": false
+    },
+    {
+      "source": "/90",
+      "destination": "/app.html",
+      "permanent": false
     }
-    { "source": "/90", 
-      "destination": "/app.html", 
-      "permanent": false }
   ]
 }
