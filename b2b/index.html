@@ -514,7 +514,7 @@ document.querySelectorAll('button[data-t]').forEach(function(b){
     return new Promise(function(res){c.toBlob(res,'image/png')});
   }
   // 견적 요청 전송 — Apps Script 웹 앱 주소를 아래에 붙여넣으세요
-  var ENDPOINT='';
+  var ENDPOINT='https://script.google.com/macros/s/AKfycbxz_kKdfgmUQT5f3-HSFxVZ9SbXEL3R4G2UcN70w-OmUrtH9H1OLgb3szfhQM8RMBmw/exec';
   if(!ENDPOINT){$('q-send').hidden=true;}
   $('q-send').addEventListener('click',async function(){
     var s=state(), msg=$('q-msg'), b=this;
